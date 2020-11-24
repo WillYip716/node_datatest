@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "d3": "^6.2.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "puppeteer": "^5.5.0"
   }
 }
