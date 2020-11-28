@@ -5,7 +5,7 @@ var fs = require("fs");
 async function grabSpreads(){
     // prepare for headless chrome
     let spreadsinfo = [];
-    let dates = ["20121014"];
+    let dates = ["2019-09-05","2019-09-08","2019-09-09","2019-09-12","2019-09-15","2019-09-16","2019-09-19","2019-09-22","2019-09-23","2019-09-26","2019-09-29","2019-09-30","2019-10-03","2019-10-06","2019-10-07","2019-10-10","2019-10-13","2019-10-14","2019-10-17","2019-10-20","2019-10-21","2019-10-24","2019-10-27","2019-10-28","2019-10-31","2019-11-03","2019-11-04","2019-11-07","2019-11-10","2019-11-11","2019-11-14","2019-11-17","2019-11-18","2019-11-21","2019-11-24","2019-11-25","2019-11-28","2019-12-01","2019-12-02","2019-12-05","2019-12-08","2019-12-09","2019-12-12","2019-12-15","2019-12-16","2019-12-21","2019-12-22","2019-12-23","2019-12-29"];
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     let url;
@@ -58,12 +58,13 @@ async function grabSpreads(){
             
 
         });
+        console.log(dates[i] + " finished");
     }
+    
 
-    console.log(spreadsinfo);
-    /*fs.writeFile("./data/spreadinfo.txt", JSON.stringify(spreadsinfo),function(err){
-        console.log("file written");
-    })*/
+    fs.writeFile("./data/2019spreads.txt", JSON.stringify(spreadsinfo),function(err){
+        console.log("file written with " + spreadsinfo.length + " games");
+    })
 
     await browser.close();
 }
