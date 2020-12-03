@@ -1,6 +1,6 @@
 var fs = require("fs");
 
-let years = ["2007"];
+let years = ["2007","2008"];
 let anomalies = [];
 
 for (let i = 0; i < years.length; i++) {
@@ -8,7 +8,7 @@ for (let i = 0; i < years.length; i++) {
   let spreads = JSON.parse(text);
   console.log(spreads.length);
   for (let j = 0; j < spreads.length; j++) {
-      if(Object.keys(spreads[j]).length !== 13){
+      if(Object.keys(spreads[j]).length !== 15){
         //console.log(spreads[j]);
         anomalies.push(spreads[j]);
       }
@@ -18,9 +18,9 @@ for (let i = 0; i < years.length; i++) {
       }*/
   }
 
-  fs.writeFile("./data/"+years[i]+"anomalies.txt", JSON.stringify(anomalies),function(err){
+  /*fs.writeFile("./data/"+years[i]+"anomalies.txt", JSON.stringify(anomalies),function(err){
     console.log("anomalies " + years[i] + " written");
-  })
+  })*/
 
 }
 
