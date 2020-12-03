@@ -11,7 +11,7 @@ async function getdvoaratings() {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     let url;
-    let parser = new RegExp(/(wei|dave)/mi);
+    let parser = new RegExp(/(off)/mi);
     // set user agent (override the default headless User Agent)
     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
     
@@ -33,7 +33,21 @@ async function getdvoaratings() {
                         let data = {"week": week[j]};
                         for(let k = 1; k < cell.length; k++){
                             if(count == 0){
-                                keys.push($(cell[k]).text());
+                                if(keys.includes($(cell[k]).text())){
+                                    if(keys.includes($(cell[k]).text() + "++")){
+                                        keys.push($(cell[k]).text() + "+++");
+                                    }
+                                    else if(keys.includes($(cell[k]).text() + "+")){
+                                        keys.push($(cell[k]).text() + "++");
+                                    }
+                                    else{
+                                        keys.push($(cell[k]).text() + "+");
+                                    }   
+                                }
+                                else{
+                                    keys.push($(cell[k]).text());
+                                }
+                                
                             }
                             else{
                                 data[keys[k].replace(/\n/g,"")] = $(cell[k]).text();
@@ -47,6 +61,7 @@ async function getdvoaratings() {
             });
             console.log("week " + week[j] + " finished");
         }
+        console.log(years[i] + " finished harvesting");
         fs.writeFile("./data/"+years[i]+"dvoaRanking.txt", JSON.stringify(yearsData),function(err){
             console.log("file written " + years[i]);
         })
