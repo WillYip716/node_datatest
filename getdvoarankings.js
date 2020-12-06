@@ -6,13 +6,14 @@ async function getdvoaratings() {
     // prepare for headless chrome
     let allDates = [];
     //let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-    let years = ["2012","2013","2014"];
-    let week = ["dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
-    //let week = ["dvoa-projections"];
+    let years = ["2018","2019"];
+    //let week = ["dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
+    let week = ["dvoa-projections","1"];
+    let orderOfRanks = ["TOTAL.","OFF.","DEF.","S.T.","SCHED."];
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     let parser = new RegExp(/(off)/mi);
-    let url,startofloop;
+    let url,startofloop,repeats;
     // set user agent (override the default headless User Agent)
     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
     
@@ -26,8 +27,44 @@ async function getdvoaratings() {
                 url = "https://www.footballoutsiders.com/dvoa-ratings/"+years[i]+"/week-"+week[j]+"-dvoa-ratings"
                 startofloop = 1;
             }
-            await page.goto(url, { waitUntil: 'networkidle0' });
+            await page.goto(url);
             const content = await page.content();
+            
+            
+            $('table', content).each((index,element) => {
+                //console.log(index);
+                let keys;
+                repeats = 0;
+                (j==0)?keys=[]:keys=["holder"];
+                let head = $(element).find("thead tr");
+                if(parser.test($(head[0]).text())){
+                    
+                    let headercell = $(head[0]).find("td");
+                    for (let k = 0; k < headercell.length; k++) {
+                        if((/RK/gi).test($(headercell[k]).text())){
+                            keys.push( orderOfRanks[repeats] + ($(headercell[k]).text().replace(/\n|\t/g,"").replace(/ /g,"")));
+                            repeats++;
+                        }
+                        else{
+                            keys.push($(headercell[k]).text().replace(/\n|\t/g,"").replace(/ /g,""));
+                        }  
+                    }
+                    let valuecells = $(element).find("tbody tr td");
+                    let data = {"year":years[i],"week": week[j]};
+                    for (let k = startofloop; k < valuecells.length; k++) {
+                        if(k!=0 && (k%keys.length-startofloop)==0){
+                            yearsData.push(data);
+                            data = {"year":years[i],"week": week[j]};
+                        }
+                        data[keys[k%keys.length-startofloop]] = $(valuecells[k]).text().replace(/\n/g,"").replace(/ /g,""); 
+                    }
+                }
+            
+                
+            });
+            console.log(yearsData);
+            console.log(yearsData.length);
+            /*
             $('tbody', content).each((index,element) => {
                 let field = $(element).find("tr");
                 //for (let k = 0; k < field.length; k++) {
@@ -42,15 +79,7 @@ async function getdvoaratings() {
                         for(let k = startofloop; k < cell.length; k++){
                             if(count == 0){
                                 if(keys.includes($(cell[k]).text())){
-                                    if(keys.includes($(cell[k]).text() + "++")){
-                                        keys.push($(cell[k]).text() + "+++");
-                                    }
-                                    else if(keys.includes($(cell[k]).text() + "+")){
-                                        keys.push($(cell[k]).text() + "++");
-                                    }
-                                    else{
-                                        keys.push($(cell[k]).text() + "+");
-                                    }   
+                                    keys.push($(cell[k]).text().replace(/\n/g,"").replace(/ /g,"") + "+");
                                 }
                                 else{
                                     keys.push($(cell[k]).text().replace(/\n/g,"").replace(/ /g,""));
@@ -76,7 +105,8 @@ async function getdvoaratings() {
         console.log(years[i] + " finished harvesting");
         fs.writeFile("./data/"+years[i]+"dvoaRanking.txt", JSON.stringify(yearsData),function(err){
             console.log("file written " + years[i]);
-        })
+        })*/
+        }
     }
 
     
