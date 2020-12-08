@@ -7,8 +7,8 @@ async function getdvoaratings() {
     let allDates = [];
     //let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
     let years = ["2018","2019"];
-    //let week = ["dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
-    let week = ["dvoa-projections","1"];
+    let week = ["dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
+    //let week = ["dvoa-projections","1"];
     let orderOfRanks = ["TOTAL.","OFF.","DEF.","S.T.","SCHED."];
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -32,7 +32,6 @@ async function getdvoaratings() {
             
             
             $('table', content).each((index,element) => {
-                //console.log(index);
                 let keys;
                 repeats = 0;
                 (j==0)?keys=[]:keys=["holder"];
@@ -40,7 +39,10 @@ async function getdvoaratings() {
                 if(parser.test($(head[0]).text())){
                     
                     let headercell = $(head[0]).find("td");
-                    for (let k = 0; k < headercell.length; k++) {
+                    if(!headercell.length){
+                        headercell = $(head[0]).find("th");
+                    }
+                    for (let k = startofloop; k < headercell.length; k++) {
                         if((/RK/gi).test($(headercell[k]).text())){
                             keys.push( orderOfRanks[repeats] + ($(headercell[k]).text().replace(/\n|\t/g,"").replace(/ /g,"")));
                             repeats++;
@@ -49,21 +51,32 @@ async function getdvoaratings() {
                             keys.push($(headercell[k]).text().replace(/\n|\t/g,"").replace(/ /g,""));
                         }  
                     }
+                    console.log(keys);
                     let valuecells = $(element).find("tbody tr td");
                     let data = {"year":years[i],"week": week[j]};
                     for (let k = startofloop; k < valuecells.length; k++) {
-                        if(k!=0 && (k%keys.length-startofloop)==0){
-                            yearsData.push(data);
+                        if((k%keys.length)==0){
+                            if(k){
+                                yearsData.push(data);
+                            }
                             data = {"year":years[i],"week": week[j]};
+                            if(!j){
+                                data[keys[k%keys.length]] = $(valuecells[k]).text().replace(/\n/g,"").replace(/ /g,""); 
+                            }
                         }
-                        data[keys[k%keys.length-startofloop]] = $(valuecells[k]).text().replace(/\n/g,"").replace(/ /g,""); 
+                        else{
+                            data[keys[k%keys.length]] = $(valuecells[k]).text().replace(/\n/g,"").replace(/ /g,""); 
+                            if(k == valuecells.length-1){
+                                yearsData.push(data);
+                            } 
+                        }
                     }
                 }
             
                 
             });
-            console.log(yearsData);
-            console.log(yearsData.length);
+        
+            
             /*
             $('tbody', content).each((index,element) => {
                 let field = $(element).find("tr");
@@ -106,7 +119,13 @@ async function getdvoaratings() {
         fs.writeFile("./data/"+years[i]+"dvoaRanking.txt", JSON.stringify(yearsData),function(err){
             console.log("file written " + years[i]);
         })*/
+            console.log("week " + week[j] + " finished");
+            console.log("data length so far " + yearsData.length);
         }
+        console.log(years[i] + " finished harvesting");
+        fs.writeFile("./data/tweaked"+years[i]+"dvoaRanking.txt", JSON.stringify(yearsData),function(err){
+            console.log("file written " + years[i]);
+        })
     }
 
     
