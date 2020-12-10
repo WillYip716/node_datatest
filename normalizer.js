@@ -1,7 +1,7 @@
 var fs = require("fs");
 
 let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-//let years = ["2015"];
+//let years = ["2007"];
 
 function teamNames(yearsToCheck) {
   let finalCount = {};
@@ -26,7 +26,7 @@ function checkKeys(yearsToCheck) {
   let finalCount = {};
   for (let i = 0; i < yearsToCheck.length; i++) {
     var text = fs.readFileSync("./data/"+yearsToCheck[i]+"dvoaRanking.txt");
-    //finalCount = {};
+    finalCount = {};
     let spreads = JSON.parse(text);
     spreads.forEach(element => {
         let keys = Object.keys(element);
@@ -39,11 +39,13 @@ function checkKeys(yearsToCheck) {
             }
           
         }
+        //console.log("Final Count for year " + yearsToCheck[i])
+        //console.log(finalCount);
     });
-    //console.log("Final Count for year " + yearsToCheck[i])
-    //console.log(finalCount);
+    console.log("Final Count for year " + yearsToCheck[i])
+    console.log(finalCount);
   }
-  console.log(finalCount);
+  //console.log(finalCount);
 }
 
 
