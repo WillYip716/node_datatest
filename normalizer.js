@@ -6,14 +6,14 @@ let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","201
 function teamNames(yearsToCheck) {
   let finalCount = {};
   for (let i = 0; i < yearsToCheck.length; i++) {
-    var text = fs.readFileSync("./data/"+yearsToCheck[i]+"dvoaRanking.txt");
+    var text = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
     let spreads = JSON.parse(text);
     spreads.forEach(element => {
-      if (element["TEAM"] in finalCount){
-          finalCount[element["TEAM"]] = parseInt(finalCount[element["TEAM"]]) + 1;
+      if (element["Team"] in finalCount){
+          finalCount[element["Team"]] = parseInt(finalCount[element["Team"]]) + 1;
       }
       else{
-          finalCount[element["TEAM"]] = 1;
+          finalCount[element["Team"]] = 1;
       }
     });
     //console.log("Final Count for year " + yearsToCheck[i])
@@ -64,7 +64,9 @@ function xlsxToJson(yearsToCheck){
 }
 
 
-teamNames(years);
+
+
+//teamNames(years);
 //checkKeys(years);
 //console.log(finalCount);
 //console.log("number of teams is " + Object.keys(finalCount).length);

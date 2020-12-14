@@ -18,11 +18,44 @@ function cleanerAndNormalize(yearsToCheck) {
   let parser9 = /SCHEDRANK/gi;
   let parser10 = /RANK|TOTAL.RK|TOTALRANK/gi;*/
   for (let i = 0; i < yearsToCheck.length; i++) {
-    var readFile = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
+    var readFile = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
     var text = readFile.toString();
-    text = text.replace(/LARM/gi,"LAR");
-    text = text.replace(/LACH/gi,"LAC");
-    text = text.replace(/JAC/gi,"JAX");
+    text = text.replace(/NewOrleans/gi,"NO");
+    text = text.replace(/Indianapolis/gi,"IND");
+    text = text.replace(/KansasCity/gi,"KC");
+    text = text.replace(/HoustonTexans/gi,"HOU");
+    text = text.replace(/Houston/gi,"HOU");
+    text = text.replace(/Denver/gi,"DEN");
+    text = text.replace(/BuffaloBills/gi,"BUF");
+    text = text.replace(/Buffalo/gi,"BUF");
+    text = text.replace(/Pittsburgh/gi,"PIT");
+    text = text.replace(/Cleveland/gi,"CLE");
+    text = text.replace(/Tennessee/gi,"TEN");
+    text = text.replace(/Jacksonville/gi,"JAX");
+    text = text.replace(/Carolina/gi,"CAR");
+    text = text.replace(/St.Louis/gi,"STL");
+    text = text.replace(/Philadelphia/gi,"PHI");
+    text = text.replace(/GreenBay/gi,"GB");
+    text = text.replace(/Atlanta/gi,"ATL");
+    text = text.replace(/Minnesota/gi,"MIN");
+    text = text.replace(/Miami/gi,"MIA");
+    text = text.replace(/Washington/gi,"WAS");
+    text = text.replace(/NewEngland/gi,"NE");
+    text = text.replace(/NYJets/gi,"NYJ");
+    text = text.replace(/TampaBay/gi,"TB");
+    text = text.replace(/Seattle/gi,"SEA");
+    text = text.replace(/Chicago/gi,"CHI");
+    text = text.replace(/SanDiego/gi,"SD");
+    text = text.replace(/Detroit/gi,"DET");
+    text = text.replace(/Oakland/gi,"OAK");
+    text = text.replace(/NYGiants|NewYork/gi,"NYG");
+    text = text.replace(/Dallas/gi,"DAL");
+    text = text.replace(/Baltimore/gi,"BAL");
+    text = text.replace(/Cincinnati/gi,"CIN");
+    text = text.replace(/Arizona/gi,"ARI");
+    text = text.replace(/SanFrancisco/gi,"SF");
+    text = text.replace(/LosAngeles|LARams/gi,"LAR");
+    text = text.replace(/LAChargers/gi,"LAC");
     /*text = text.replace(parser,"TOTAL.DVOA");
     text = text.replace(parser1,"DAVE");
     text = text.replace(parser2,"WEI.DVOA");
@@ -37,7 +70,7 @@ function cleanerAndNormalize(yearsToCheck) {
     //console.log(spreads.length);
     
   
-    fs.writeFile("./data/"+yearsToCheck[i]+"dvoaRanking.txt", text,function(err){
+    fs.writeFile("./data/nflodds" + yearsToCheck[i] +".txt", text,function(err){
       console.log("anomalies " + yearsToCheck[i] + " written");
     })
   

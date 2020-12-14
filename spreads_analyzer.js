@@ -10,10 +10,10 @@ function xlscNameCount(yearsToCheck){
   var teamNames = {};
 
   for(let i = 0; i < yearsToCheck.length; i++ ){
-    var workbook = XLSX.readFile("./data/nflodds" + yearsToCheck[i] +".xlsx");
+    /*var workbook = XLSX.readFile("./data/nflodds" + yearsToCheck[i] +".xlsx");
     var sheet_name_list = workbook.SheetNames;
     var teamspreads = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    //console.log(teamspreads);
+    console.log(teamspreads);*/
 
     teamspreads.forEach(element => {
       if (element["Team"] in teamNames){
