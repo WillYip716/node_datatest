@@ -18,9 +18,13 @@ function cleanerAndNormalize(yearsToCheck) {
   let parser9 = /SCHEDRANK/gi;
   let parser10 = /RANK|TOTAL.RK|TOTALRANK/gi;*/
   for (let i = 0; i < yearsToCheck.length; i++) {
-    var readFile = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+    //var readFile = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+    var readFile = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
     var text = readFile.toString();
-    text = text.replace(/"pk"/gi,"0");
+    text = text.replace(/LARM/gi,"LAR");
+    text = text.replace(/LACH/gi,"LAC");
+    text = text.replace(/JAC/gi,"JAX");
+    //text = text.replace(/"pk"/gi,"0");
     /*text = text.replace(/NewOrleans/gi,"NO");
     text = text.replace(/Indianapolis/gi,"IND");
     text = text.replace(/KansasCity/gi,"KC");
@@ -71,7 +75,7 @@ function cleanerAndNormalize(yearsToCheck) {
     //console.log(spreads.length);
     
   
-    fs.writeFile("./data/nflodds" + yearsToCheck[i] +".txt", text,function(err){
+    fs.writeFile("./data/" + yearsToCheck[i] +"dvoaRanking.txt", text,function(err){
       console.log("anomalies " + yearsToCheck[i] + " written");
     })
   

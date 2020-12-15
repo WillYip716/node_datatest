@@ -7,6 +7,7 @@ function teamNames(yearsToCheck) {
   let finalCount = {};
   for (let i = 0; i < yearsToCheck.length; i++) {
     var text = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+    //var text = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
     let spreads = JSON.parse(text);
     spreads.forEach(element => {
       if (element["Team"] in finalCount){
@@ -49,7 +50,7 @@ function checkKeys(yearsToCheck) {
   console.log(finalCount);
 }
 
-function xlsxToJson(yearsToCheck){
+/*function xlsxToJson(yearsToCheck){
 
   for(let i = 0; i < yearsToCheck.length; i++ ){
     var workbook = XLSX.readFile("./data/nflodds" + yearsToCheck[i] +".xlsx");
@@ -61,12 +62,12 @@ function xlsxToJson(yearsToCheck){
       console.log("file written " + yearsToCheck[i]);
     })
   }  
-}
+}*/
 
 
 
 
-//teamNames(years);
+teamNames(years);
 //checkKeys(years);
 //console.log(finalCount);
 //console.log("number of teams is " + Object.keys(finalCount).length);
