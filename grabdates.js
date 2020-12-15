@@ -77,6 +77,7 @@ function addDates(yearsToCheck) {
       });
       fs.writeFile("./data/nflodds" + yearsToCheck[i] +".txt", JSON.stringify(spreads),function(err){
           console.log("year is " + yearsToCheck[i]);
+          console.log(spreads.length);
         console.log(output);
       })
       

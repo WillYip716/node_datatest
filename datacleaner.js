@@ -20,7 +20,8 @@ function cleanerAndNormalize(yearsToCheck) {
   for (let i = 0; i < yearsToCheck.length; i++) {
     var readFile = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
     var text = readFile.toString();
-    text = text.replace(/NewOrleans/gi,"NO");
+    text = text.replace(/"pk"/gi,"0");
+    /*text = text.replace(/NewOrleans/gi,"NO");
     text = text.replace(/Indianapolis/gi,"IND");
     text = text.replace(/KansasCity/gi,"KC");
     text = text.replace(/HoustonTexans/gi,"HOU");
@@ -56,7 +57,7 @@ function cleanerAndNormalize(yearsToCheck) {
     text = text.replace(/SanFrancisco/gi,"SF");
     text = text.replace(/LosAngeles|LARams/gi,"LAR");
     text = text.replace(/LAChargers/gi,"LAC");
-    /*text = text.replace(parser,"TOTAL.DVOA");
+    text = text.replace(parser,"TOTAL.DVOA");
     text = text.replace(parser1,"DAVE");
     text = text.replace(parser2,"WEI.DVOA");
     text = text.replace(parser3,"OFF.DVOA");
