@@ -2,35 +2,58 @@ var fs = require("fs");
 var XLSX = require('xlsx')
 
 
-let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+
 
 //let years = ["2007"];
 
-function xlscNameCount(yearsToCheck){
-  var teamNames = {};
+function analyzeSpread(vteam, hteam){
+    let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    let datatable =[];
 
-  for(let i = 0; i < yearsToCheck.length; i++ ){
-    /*var workbook = XLSX.readFile("./data/nflodds" + yearsToCheck[i] +".xlsx");
-    var sheet_name_list = workbook.SheetNames;
-    var teamspreads = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    console.log(teamspreads);*/
+    for (let i = 0; i < years.length; i++) {
+      let text = fs.readFileSync("./data/nflodds" + years[i] +".txt");
+      let spreads = JSON.parse(text);
 
-    teamspreads.forEach(element => {
-      if (element["Team"] in teamNames){
-        teamNames[element["Team"]] = parseInt(teamNames[element["Team"]]) + 1;
-      }
-      else{
-        teamNames[element["Team"]] = 1;
-      }
-    });
-    //console.log("Final Count for year " + yearsToCheck[i])
-    //console.log(teamNames);
-  }
-  console.log(teamNames);
-  console.log(Object.keys(teamNames).length);
+      let matchedgames = spreads.filter(element=> fullcheck(element,vteam,hteam));
+      datatable.push(matchedgames);
+      
+    }
+
 }
 
-xlscNameCount(years);
+
+function fullcheck(element,visitor,home){
+
+    let vtotalcheck = checker(element,visitor,"vTOTAL.RNK",1);
+    let htotalcheck = checker(element,home,"hTOTAL.RNK",1);
+
+    let voffcheck = checker(element,visitor,"vOFF.RNK",1);
+    let hoffcheck = checker(element,home,"hOFF.RNK",1);
+
+    let vdefcheck = checker(element,visitor,"vDEF.RNK",1);
+    let hdefcheck = checker(element,home,"hDEF.RNK",1);
+
+    let vstcheck = checker(element,visitor,"vST.RNK",1);
+    let hstcheck = checker(element,home,"hST.RNK",1);
+
+    if(vtotalcheck&&htotalcheck&&voffcheck&&hoffcheck&&vdefcheck&&hdefcheck&&vstcheck&&hstcheck){
+      return true;
+    }
+
+
+}
+
+
+function checker(element,team,value,deviation){
+    let checked = ((parseFloat(team[value])-deviation)<=(parseFloat(element[value])))&&((parseFloat(element[value]))<=(parseFloat(team[value])+deviation));
+
+    return checked;
+}
+
+
+
+
+analyzeSpread();
 
 
 /*
