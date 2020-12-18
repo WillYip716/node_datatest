@@ -96,4 +96,4 @@ function merge(yearsToCheck){
     
 }
 
-merge(["2015","2014"]);
+merge(years);

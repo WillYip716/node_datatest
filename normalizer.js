@@ -6,15 +6,15 @@ let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","201
 function teamNames(yearsToCheck) {
   let finalCount = {};
   for (let i = 0; i < yearsToCheck.length; i++) {
-    var text = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+    var text = fs.readFileSync("./data/mergedstats" + yearsToCheck[i] +".txt");
     //var text = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
     let spreads = JSON.parse(text);
     spreads.forEach(element => {
-      if (element["Team"] in finalCount){
-          finalCount[element["Team"]] = parseInt(finalCount[element["Team"]]) + 1;
+      if (element["hteam"] in finalCount){
+          finalCount[element["hteam"]] = parseInt(finalCount[element["hteam"]]) + 1;
       }
       else{
-          finalCount[element["Team"]] = 1;
+          finalCount[element["hteam"]] = 1;
       }
     });
     //console.log("Final Count for year " + yearsToCheck[i])
