@@ -3,31 +3,20 @@ var XLSX = require('xlsx')
 const csv = require('csv-parser');
 
 
-
-//let years = ["2007"];
-//TOTAL OFFENSE DEFENSE ST
-//SD 30 	-26.8% 	19 	-1.1% 	22 	7.3% 	32 	-13.5%
-//LV 22 	-8.7% 	15 	1.5% 	28 	10.5% 	12 	1.5%
-
-
-
-
 function getallgames(){
     let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
     for (let i = 0; i < years.length; i++) {
       let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
       let spreads = JSON.parse(text);
 
-      console.log(spreads.length);
-      
+      console.log(spreads.length); 
     }
-
 }
 
 
 function analyzeSpread(game){
     let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-    //let years = ["2007"];
+    //let years = ["2014","2015","2016","2017","2018","2019"];
     let datatable =[];
 
     for (let i = 0; i < years.length; i++) {
@@ -40,11 +29,11 @@ function analyzeSpread(game){
     }
 
     if(datatable.length){
-      let avgvscore = 0;
-      let avghscore = 0;
-      let avgscorespread = 0;
-      let avgspread = 0;
-      let avgou = 0;
+      let avgvscore = [];
+      let avghscore = [];
+      let avgscorespread = [];
+      let avgspread = [];
+      let avgou = [];
       let results;
       let hrecord = 0;
       let vrecord = 0;
@@ -54,11 +43,11 @@ function analyzeSpread(game){
       let outies = 0;
 
       datatable.forEach(e => {
-          avgvscore+= parseFloat(e["vscore"]) ;
-          avghscore+= parseFloat(e["hscore"]);
-          avgspread+= parseFloat(e["hcspread"]);
-          avgou+= parseFloat(e["ouclose"]);
-          avgscorespread+= parseFloat(e["vscore"]) - parseFloat(e["hscore"]);
+          avgvscore.push(parseFloat(e["vscore"]));
+          avghscore.push(parseFloat(e["hscore"]));
+          avgspread.push(parseFloat(e["hcspread"]));
+          avgou.push(parseFloat(e["ouclose"]));
+          avgscorespread.push(parseFloat(e["vscore"]) - parseFloat(e["hscore"]));
 
           results = spreadResult(e);
           if(results["winner"] == "home"){
@@ -82,19 +71,24 @@ function analyzeSpread(game){
       });
 
       //console.log(datatable);
-      console.log(datatable.length);
+      console.log("number of compared games " + datatable.length);
 
-      console.log("avg score of visitors : " + (avgvscore/datatable.length));
-      console.log("avg score of home : " + (avghscore/datatable.length));
-      console.log("avg score spread result : " + (avgscorespread/datatable.length));
-      console.log("avg closing home spread : " + (avgspread/datatable.length));
-      console.log("avg closing o/u : " + (avgou/datatable.length));
-      console.log("visitors have beat the spread " + vrecord);
-      console.log("home has beat the spread " + hrecord);
-      console.log("spread has tied " + trecord);
+      spreadCalcs(avgvscore,"visitor");
+      spreadCalcs(avghscore,"home");
+      spreadCalcs(avgscorespread,"average score spread");
+      spreadCalcs(avgspread,"average of spread");
+      spreadCalcs(avgou, "average over/under" );
+
+      console.log("visitor-home-ties : " + vrecord +"-" +hrecord +"-" + trecord);
       console.log("overs-unders-ties : " + overs +"-" +unders +"-" + outies);
     }
     
+
+}
+
+function spreadCalcs(arr,headline){
+    console.log(headline +" averages: " + (arr.reduce((a,b) => a + b, 0)/arr.length).toFixed(2));
+    console.log(headline + " min: " + Math.min(...arr) + " max: " + Math.max(...arr) + " std: " + getsd(arr).toFixed(2));
 
 }
 
@@ -163,7 +157,7 @@ function spreadResult(game){
     return results;
 }
 
-function getStandardDeviation (array) {
+function getsd (array) {
   const n = array.length
   const mean = array.reduce((a, b) => a + b) / n
   return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
@@ -172,7 +166,6 @@ function getStandardDeviation (array) {
 
 function weeksspread(){
     
-
     const thisweekrankings = []
     fs.createReadStream('./data/2020 Team DVOA Ratings Overall.csv')
       .pipe(csv())
@@ -248,6 +241,7 @@ function getweeksinfo(dvoarankings){
       game["hST.DVOA"] = hdvoa['Special Teams DVOA'];
       console.log(game["visitor"] + " at " + game["home"]);
       analyzeSpread(game);
+      console.log("");
     }
 }
 
