@@ -48,7 +48,7 @@ function merge(yearsToCheck){
                 if(vteamdvoa["WEI.DVOA"]){
                     game["vWEI.DVOA"] = vteamdvoa["WEI.DVOA"];
                 }
-                else if(vteamdvoa["vDAVE"]){
+                if(vteamdvoa["DAVE"]){
                     game["vDAVE"] = vteamdvoa["DAVE"];
                 }
                 game["vTOTAL.RNK"] = vteamdvoa["TOTAL.RNK"];
@@ -63,10 +63,10 @@ function merge(yearsToCheck){
                 game["vLASTWEEK"] = vteamdvoa["LASTWEEK"];
     
                 if(hteamdvoa["WEI.DVOA"]){
-                    game["vWEI.DVOA"] = hteamdvoa["WEI.DVOA"];
+                    game["hWEI.DVOA"] = hteamdvoa["WEI.DVOA"];
                 }
-                else if(hteamdvoa["vDAVE"]){
-                    game["vDAVE"] = hteamdvoa["DAVE"];
+                if(hteamdvoa["DAVE"]){
+                    game["hDAVE"] = hteamdvoa["DAVE"];
                 }
                 game["hTOTAL.RNK"] = hteamdvoa["TOTAL.RNK"];
                 game["hTOTAL.DVOA"] = hteamdvoa["TOTAL.DVOA"];

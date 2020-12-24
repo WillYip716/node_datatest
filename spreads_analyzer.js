@@ -1,16 +1,27 @@
 var fs = require("fs");
 var XLSX = require('xlsx')
 const csv = require('csv-parser');
-
+const converter = require('json-2-csv');
 
 function getallgames(){
     let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    let data = [];
     for (let i = 0; i < years.length; i++) {
       let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
       let spreads = JSON.parse(text);
 
-      console.log(spreads.length); 
+      data = data.concat(spreads); 
     }
+
+    converter.json2csv(data, (err, csv) => {
+        if (err) {
+            throw err;
+        }
+        console.log("success");
+    
+        // write CSV to a file
+        fs.writeFileSync('./data/merged_data2007_2019.csv', csv);
+    });
 }
 
 
@@ -245,9 +256,9 @@ function getweeksinfo(dvoarankings){
     }
 }
 
-//getallgames();
+getallgames();
 //
-weeksspread();
+//weeksspread();
 
 
 /*
