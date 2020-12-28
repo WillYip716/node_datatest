@@ -3,27 +3,6 @@ var XLSX = require('xlsx')
 const csv = require('csv-parser');
 const converter = require('json-2-csv');
 
-function getallgames(){
-    let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-    let data = [];
-    for (let i = 0; i < years.length; i++) {
-      let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
-      let spreads = JSON.parse(text);
-
-      data = data.concat(spreads); 
-    }
-
-    converter.json2csv(data, (err, csv) => {
-        if (err) {
-            throw err;
-        }
-        console.log("success");
-    
-        // write CSV to a file
-        fs.writeFileSync('./data/merged_data2007_2019.csv', csv);
-    });
-}
-
 
 function analyzeSpread(game){
     let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
@@ -39,60 +18,7 @@ function analyzeSpread(game){
       
     }
 
-    if(datatable.length){
-      let avgvscore = [];
-      let avghscore = [];
-      let avgscorespread = [];
-      let avgspread = [];
-      let avgou = [];
-      let results;
-      let hrecord = 0;
-      let vrecord = 0;
-      let trecord = 0;
-      let overs = 0;
-      let unders = 0;
-      let outies = 0;
-
-      datatable.forEach(e => {
-          avgvscore.push(parseFloat(e["vscore"]));
-          avghscore.push(parseFloat(e["hscore"]));
-          avgspread.push(parseFloat(e["hcspread"]));
-          avgou.push(parseFloat(e["ouclose"]));
-          avgscorespread.push(parseFloat(e["vscore"]) - parseFloat(e["hscore"]));
-
-          results = spreadResult(e);
-          if(results["winner"] == "home"){
-              hrecord+=1;
-          }
-          else if(results["winner"] == "visitor"){
-              vrecord+=1;
-          }
-          else if(results["winner"] == "tie"){
-              trecord+=1;
-          }
-          if(results["ou"] == "over"){
-              overs+=1;
-          }
-          else if(results["ou"] == "under"){
-              unders+=1;
-          }
-          else if(results["ou"] == "tie"){
-              outies+=1;
-          }
-      });
-
-      //console.log(datatable);
-      console.log("number of compared games " + datatable.length);
-
-      spreadCalcs(avgvscore,"visitor");
-      spreadCalcs(avghscore,"home");
-      spreadCalcs(avgscorespread,"average score spread");
-      spreadCalcs(avgspread,"average of spread");
-      spreadCalcs(avgou, "average over/under" );
-
-      console.log("visitor-home-ties : " + vrecord +"-" +hrecord +"-" + trecord);
-      console.log("overs-unders-ties : " + overs +"-" +unders +"-" + outies);
-    }
+    analyzegames(datatable);
     
 
 }
@@ -111,19 +37,21 @@ function fullcheck(element,game){
     let htotalcheck = checker(element,game,"hTOTAL.RNK",32);
     */
 
-    let voffcheck = checker(element,game,"vOFF.DVOA",7);
-    let hoffcheck = checker(element,game,"hOFF.DVOA",7);
+    let voffcheck = checker(element,game,"vOFF.DVOA",6);
+    let hoffcheck = checker(element,game,"hOFF.DVOA",6);
 
-    let vdefcheck = checker(element,game,"vDEF.DVOA",7);
-    let hdefcheck = checker(element,game,"hDEF.DVOA",7);
+    let vdefcheck = checker(element,game,"vDEF.DVOA",6);
+    let hdefcheck = checker(element,game,"hDEF.DVOA",6);
   
-    let vstcheck = checker(element,game,"vST.DVOA",7);
-    let hstcheck = checker(element,game,"hST.DVOA",7);
+    let vstcheck = checker(element,game,"vST.DVOA",6);
+    let hstcheck = checker(element,game,"hST.DVOA",6);
     //if(vtotalcheck&&htotalcheck&&voffcheck&&hoffcheck&&vdefcheck&&hdefcheck&&vstcheck&&hstcheck){
     if(voffcheck&&hoffcheck&&vdefcheck&&hdefcheck&&vstcheck&&hstcheck){
     //if(vtotalcheck&&htotalcheck){
       return true;
     }
+
+  
 }
 
 
@@ -226,7 +154,7 @@ function getweeksinfo(dvoarankings){
       'Las Vegas Raiders':'LV'
     };
 
-    let thisweekslines = "Los%20Angeles%20Chargers%20at%20Las%20Vegas%20Raiders%20%28-3.5%2C%2052.0%29%0ABuffalo%20Bills%20at%20Denver%20Broncos%20%28+6.0%2C%2049.5%29%0ACarolina%20Panthers%20at%20Green%20Bay%20Packers%20%28-8.5%2C%2051.5%29%0ATampa%20Bay%20Buccaneers%20at%20Atlanta%20Falcons%20%28+6.0%2C%2049.5%29%0ASan%20Francisco%2049ers%20at%20Dallas%20Cowboys%20%28+3.0%2C%2045.0%29%0ADetroit%20Lions%20at%20Tennessee%20Titans%20%28-10.5%2C%2051.5%29%0AHouston%20Texans%20at%20Indianapolis%20Colts%20%28-7.5%2C%2051.0%29%0ANew%20England%20Patriots%20at%20Miami%20Dolphins%20%28-2.0%2C%2041.5%29%0AChicago%20Bears%20at%20Minnesota%20Vikings%20%28-3.0%2C%2046.5%29%0ASeattle%20Seahawks%20at%20Washington%20%28+5.5%2C%2044.5%29%0AJacksonville%20Jaguars%20at%20Baltimore%20Ravens%20%28-13.0%2C%2047.5%29%0ANew%20York%20Jets%20at%20Los%20Angeles%20Rams%20%28-17.5%2C%2044.0%29%0APhiladelphia%20Eagles%20at%20Arizona%20Cardinals%20%28-6.5%2C%2049.5%29%0AKansas%20City%20Chiefs%20at%20New%20Orleans%20Saints%20%28+3.0%2C%2051.5%29%0ACleveland%20Browns%20at%20New%20York%20Giants%20%28+6.0%2C%2044.5%29%0APittsburgh%20Steelers%20at%20Cincinnati%20Bengals%20%28+13.0%2C%2040.5%29";
+    let thisweekslines = "Minnesota%20Vikings%20at%20New%20Orleans%20Saints%20%28-7.0%2C%2050.5%29%0ATampa%20Bay%20Buccaneers%20at%20Detroit%20Lions%20%28+9.5%2C%2054.0%29%0ASan%20Francisco%2049ers%20at%20Arizona%20Cardinals%20%28-5.0%2C%2049.0%29%0AMiami%20Dolphins%20at%20Las%20Vegas%20Raiders%20%28+3.0%2C%2047.5%29%0AAtlanta%20Falcons%20at%20Kansas%20City%20Chiefs%20%28-10.5%2C%2054.0%29%0ACleveland%20Browns%20at%20New%20York%20Jets%20%28+9.5%2C%2047.5%29%0AIndianapolis%20Colts%20at%20Pittsburgh%20Steelers%20%28+1.5%2C%2044.5%29%0AChicago%20Bears%20at%20Jacksonville%20Jaguars%20%28+7.5%2C%2047.0%29%0ANew%20York%20Giants%20at%20Baltimore%20Ravens%20%28-10.5%2C%2044.5%29%0ACincinnati%20Bengals%20at%20Houston%20Texans%20%28-7.5%2C%2046.0%29%0ADenver%20Broncos%20at%20Los%20Angeles%20Chargers%20%28-3.0%2C%2048.5%29%0ACarolina%20Panthers%20at%20Washington%20%28-1.0%2C%2043.0%29%0APhiladelphia%20Eagles%20at%20Dallas%20Cowboys%20%28+2.5%2C%2049.5%29%0ALos%20Angeles%20Rams%20at%20Seattle%20Seahawks%20%28-1.5%2C%2047.5%29%0ATennessee%20Titans%20at%20Green%20Bay%20Packers%20%28-3.0%2C%2056.0%29%0ABuffalo%20Bills%20at%20New%20England%20Patriots%20%28+7.0%2C%2046.0%29";
 
     let linesArr = unescape(thisweekslines).split("\n");
     let linereader = new RegExp(/([A-Za-z0-9 ]*)\sat\s([A-Za-z0-9 ]*)\s\((\+|\-)([0-9.]*),\s([0-9.]*)\)/);
@@ -256,9 +184,92 @@ function getweeksinfo(dvoarankings){
     }
 }
 
-getallgames();
+function divVnondiv(){
+    //let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    let years = ["2015","2016","2017","2018","2019"];
+    let div =[];
+    let nondiv = [];
+
+    for (let i = 0; i < years.length; i++) {
+      let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
+      let spreads = JSON.parse(text);
+
+      let divgames = spreads.filter(element=> element["vdivision"] == element["hdivision"]);
+      let nondivgames = spreads.filter(element=> element["vdivision"] !== element["hdivision"]);
+      div = div.concat(divgames);
+      nondiv = nondiv.concat(nondivgames);
+    }
+    console.log("div games : ");
+    analyzegames(div);
+    console.log();
+    console.log("non div games : ");
+    analyzegames(nondiv);
+
+    
+}
+
+function analyzegames(datatable){
+    if(datatable.length){
+      let avgvscore = [];
+      let avghscore = [];
+      let avgscorespread = [];
+      let avgspread = [];
+      let avgou = [];
+      let results;
+      let hrecord = 0;
+      let vrecord = 0;
+      let trecord = 0;
+      let overs = 0;
+      let unders = 0;
+      let outies = 0;
+
+      datatable.forEach(e => {
+          avgvscore.push(parseFloat(e["vscore"]));
+          avghscore.push(parseFloat(e["hscore"]));
+          avgspread.push(parseFloat(e["hcspread"]));
+          avgou.push(parseFloat(e["ouclose"]));
+          avgscorespread.push(parseFloat(e["vscore"]) - parseFloat(e["hscore"]));
+
+          results = spreadResult(e);
+          if(results["winner"] == "home"){
+              hrecord+=1;
+          }
+          else if(results["winner"] == "visitor"){
+              vrecord+=1;
+          }
+          else if(results["winner"] == "tie"){
+              trecord+=1;
+          }
+          if(results["ou"] == "over"){
+              overs+=1;
+          }
+          else if(results["ou"] == "under"){
+              unders+=1;
+          }
+          else if(results["ou"] == "tie"){
+              outies+=1;
+          }
+      });
+
+      //console.log(datatable);
+      console.log("number of compared games " + datatable.length);
+
+      spreadCalcs(avgvscore,"visitor");
+      spreadCalcs(avghscore,"home");
+      spreadCalcs(avgscorespread,"average score spread");
+      spreadCalcs(avgspread,"average of spread");
+      spreadCalcs(avgou, "average over/under" );
+
+      console.log("visitor-home-ties : " + vrecord +"-" +hrecord +"-" + trecord);
+      console.log("overs-unders-ties : " + overs +"-" +unders +"-" + outies);
+    }
+}
+
+//getallgames();
 //
 //weeksspread();
+divVnondiv();
+
 
 
 /*

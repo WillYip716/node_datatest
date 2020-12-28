@@ -1,9 +1,48 @@
 var fs = require("fs");
+var XLSX = require('xlsx')
+const csv = require('csv-parser');
+const converter = require('json-2-csv');
 
 let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
 
 function merge(yearsToCheck){
-    let wkey = ["error","dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"]
+    let wkey = ["error","dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
+    let divkey = {
+        "BAL"	: "afcn",
+        "CIN" : "afcn",
+        "PIT"	: "afcn",
+        "CLE": "afcn",
+        "BUF": "afce",
+        "MIA": "afce",
+        "NE": "afce",
+        "NYJ": "afce",
+        "IND" : "afcs",
+        "HOU": "afcs",
+        "TEN"	: "afcs",
+        "JAX" : "afcs",
+        "SD": "afcw",
+        "OAK": "afcw",
+        "DEN"	: "afcw",
+        "KC"	: "afcw",
+        "LAC": "afcw",
+        "DET"	: "nfcn",
+        "CHI"	: "nfcn",
+        "GB" : "nfcn",
+        "MIN" : "nfcn",
+        "WAS" : "nfce",
+        "PHI"	: "nfce",
+        "NYG"	: "nfce",
+        "DAL" : "nfce",
+        "CAR"	 : "nfcs",
+        "ATL"	: "nfcs",
+        "TB" : "nfcs",
+        "NO" : "nfcs",
+        "ARI"	: "nfcw",
+        "SF" : "nfcw",
+        "SEA" : "nfcw",
+        "STL": "nfcw",
+        "LAR": "nfcw"
+    };
     for(let i = 0; i<yearsToCheck.length;i++){
         let text1 = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
         let spreads = JSON.parse(text1);
@@ -16,7 +55,9 @@ function merge(yearsToCheck){
             game["year"] = yearsToCheck[i];
             game["week"] = spreads[j]["week"];
             game["vteam"] = spreads[j-1]["Team"];
+            game["vdivision"] = divkey[game["vteam"]];
             game["hteam"] = spreads[j]["Team"];
+            game["hdivision"] = divkey[game["hteam"]];
             game["vscore"] = spreads[j-1]["Final"];
             game["hscore"] = spreads[j]["Final"];   
             if(spreads[j]["VH"] == "N"){
@@ -94,6 +135,28 @@ function merge(yearsToCheck){
         })
     }
     
+}
+
+
+function getallgames(){
+    let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    let data = [];
+    for (let i = 0; i < years.length; i++) {
+      let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
+      let spreads = JSON.parse(text);
+
+      data = data.concat(spreads); 
+    }
+
+    converter.json2csv(data, (err, csv) => {
+        if (err) {
+            throw err;
+        }
+        console.log("success");
+    
+        // write CSV to a file
+        fs.writeFileSync('./data/merged_data2007_2019.csv', csv);
+    });
 }
 
 merge(years);
