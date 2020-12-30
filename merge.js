@@ -4,8 +4,9 @@ const csv = require('csv-parser');
 const converter = require('json-2-csv');
 
 let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-
 function merge(yearsToCheck){
+
+    
     let wkey = ["error","dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
     let divkey = {
         "BAL"	: "afcn",
@@ -139,10 +140,13 @@ function merge(yearsToCheck){
 
 
 function getallgames(){
-    let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    //let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    let years = ["2015","2016","2017","2018"];
     let data = [];
     for (let i = 0; i < years.length; i++) {
-      let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
+      //let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
+      let text = fs.readFileSync("./data/ml/mldata" + years[i] +".txt");
+      
       let spreads = JSON.parse(text);
 
       data = data.concat(spreads); 
@@ -155,8 +159,142 @@ function getallgames(){
         console.log("success");
     
         // write CSV to a file
-        fs.writeFileSync('./data/merged_data2007_2019.csv', csv);
+        fs.writeFileSync('./data/ml/merged_mldata2014-2018.csv', csv);
     });
 }
 
-merge(years);
+
+function mlmerge(yearsToCheck){
+
+    
+    let wkey = ["error","dvoa-projections","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"];
+    let divkey = {
+        "BAL"	: "afcn",
+        "CIN" : "afcn",
+        "PIT"	: "afcn",
+        "CLE": "afcn",
+        "BUF": "afce",
+        "MIA": "afce",
+        "NE": "afce",
+        "NYJ": "afce",
+        "IND" : "afcs",
+        "HOU": "afcs",
+        "TEN"	: "afcs",
+        "JAX" : "afcs",
+        "SD": "afcw",
+        "OAK": "afcw",
+        "DEN"	: "afcw",
+        "KC"	: "afcw",
+        "LAC": "afcw",
+        "DET"	: "nfcn",
+        "CHI"	: "nfcn",
+        "GB" : "nfcn",
+        "MIN" : "nfcn",
+        "WAS" : "nfce",
+        "PHI"	: "nfce",
+        "NYG"	: "nfce",
+        "DAL" : "nfce",
+        "CAR"	 : "nfcs",
+        "ATL"	: "nfcs",
+        "TB" : "nfcs",
+        "NO" : "nfcs",
+        "ARI"	: "nfcw",
+        "SF" : "nfcw",
+        "SEA" : "nfcw",
+        "STL": "nfcw",
+        "LAR": "nfcw"
+    };
+    for(let i = 0; i<yearsToCheck.length;i++){
+        let text1 = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+        let spreads = JSON.parse(text1);
+        let text2 = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
+        let dvoastats = JSON.parse(text2);
+        let mergedData = [];
+        //console.log("spreads length for " + yearsToCheck[i] + ": " + spreads.length);
+        for (let j = 1; j < 512; j+=2) {
+            let game = {};
+            game["vscore"] = spreads[j-1]["Final"];
+            game["hscore"] = spreads[j]["Final"];   
+            if(divkey[spreads[j-1]["Team"]] == divkey[spreads[j]["Team"]]){
+                game["divgame"] = 1;
+            }else{
+                game["divgame"] = 0;
+            }
+            if(spreads[j]["VH"] == "N"){
+                game["nsite"] = 1;
+            }else{
+                game["nsite"] = 0;
+            }
+            if(spreads[j]["Open"] > spreads[j-1]["Open"]){
+                game["vospread"] = parseFloat("-" + spreads[j-1]["Open"]);
+                game["hospread"] = parseFloat("+" + spreads[j-1]["Open"]); 
+                game["ouopen"] = parseFloat(spreads[j]["Open"]);
+            }
+            else{
+                game["vospread"] = parseFloat("+" + spreads[j]["Open"]);
+                game["hospread"] = parseFloat("-" + spreads[j]["Open"]);
+                game["ouopen"] = parseFloat(spreads[j-1]["Open"]);
+            }
+            if(spreads[j]["Close"] > spreads[j-1]["Close"]){
+                game["vcspread"] = parseFloat("-" + spreads[j-1]["Close"]);
+                game["hcspread"] = parseFloat("+" + spreads[j-1]["Close"]);
+                game["ouclose"] = parseFloat(spreads[j]["Close"]);
+            }
+            else{
+                game["vcspread"] = parseFloat("+" + spreads[j]["Close"]);
+                game["hcspread"] = parseFloat("-" + spreads[j]["Close"]);
+                game["ouclose"] = parseFloat(spreads[j-1]["Close"]);
+            }
+            let vteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j-1]["Team"] && element.week == wkey[spreads[j]["week"]]);
+            let hteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j]["Team"] && element.week == wkey[spreads[j]["week"]]);
+            if(vteamdvoa&&hteamdvoa&&vteamdvoa["OFF.DVOA"]){
+                if(vteamdvoa["WEI.DVOA"]){
+                    game["vTOTAL.DVOA"] = parseFloat(vteamdvoa["WEI.DVOA"]);
+                }
+                else if(vteamdvoa["DAVE"]){
+                    game["vTOTAL.DVOA"] = parseFloat(vteamdvoa["DAVE"]);
+                }else{
+                    game["vTOTAL.DVOA"] = parseFloat(vteamdvoa["TOTAL.DVOA"]);
+                }
+                game["vTOTAL.RNK"] = vteamdvoa["TOTAL.RNK"];
+                game["vOFF.RNK"] = vteamdvoa["OFF.RNK"];
+                game["vOFF.DVOA"] = parseFloat(vteamdvoa["OFF.DVOA"]);
+                game["vDEF.RNK"] = vteamdvoa["DEF.RNK"];
+                game["vDEF.DVOA"] = parseFloat(vteamdvoa["DEF.DVOA"]);
+                game["vST.RNK"] = vteamdvoa["ST.RNK"];
+                game["vST.DVOA"] = parseFloat(vteamdvoa["ST.DVOA"]);
+    
+                if(hteamdvoa["WEI.DVOA"]){
+                    game["hTOTAL.DVOA"] = parseFloat(hteamdvoa["WEI.DVOA"]);
+                }
+                else if(hteamdvoa["DAVE"]){
+                    game["hTOTAL.DVOA"] = parseFloat(hteamdvoa["DAVE"]);
+                }else{
+                    game["hTOTAL.DVOA"] = parseFloat(hteamdvoa["TOTAL.DVOA"]);
+                }
+                game["hTOTAL.RNK"] = hteamdvoa["TOTAL.RNK"];
+                game["hOFF.RNK"] = hteamdvoa["OFF.RNK"];
+                game["hOFF.DVOA"] = parseFloat(hteamdvoa["OFF.DVOA"]);
+                game["hDEF.RNK"] = hteamdvoa["DEF.RNK"];
+                game["hDEF.DVOA"] = parseFloat(hteamdvoa["DEF.DVOA"]);
+                game["hST.RNK"] = hteamdvoa["ST.RNK"];
+                game["hST.DVOA"] = parseFloat(hteamdvoa["ST.DVOA"]);
+    
+    
+                mergedData.push(game);
+            }
+            
+            
+
+
+        }
+
+        fs.writeFile("./data/ml/mldata" + yearsToCheck[i] +".txt", JSON.stringify(mergedData),function(err){
+            console.log("file written " + yearsToCheck[i]);
+        })
+    }
+    
+}
+
+getallgames();
+//mlmerge(years);
