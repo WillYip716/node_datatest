@@ -140,8 +140,8 @@ function merge(yearsToCheck){
 
 
 function getallgames(){
-    //let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-    let years = ["2015","2016","2017","2018"];
+    let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+    //let years = ["2019"];
     let data = [];
     for (let i = 0; i < years.length; i++) {
       //let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
@@ -159,7 +159,7 @@ function getallgames(){
         console.log("success");
     
         // write CSV to a file
-        fs.writeFileSync('./data/ml/merged_mldata2014-2018.csv', csv);
+        fs.writeFileSync('./data/ml/merged_mldata2007-2019.csv', csv);
     });
 }
 
@@ -279,6 +279,26 @@ function mlmerge(yearsToCheck){
                 game["hDEF.DVOA"] = parseFloat(hteamdvoa["DEF.DVOA"]);
                 game["hST.RNK"] = hteamdvoa["ST.RNK"];
                 game["hST.DVOA"] = parseFloat(hteamdvoa["ST.DVOA"]);
+
+                if((parseFloat(game["hscore"])+parseFloat(game["hcspread"])) == (parseFloat(game["vscore"]))){
+                    game["winner"] = "tie";
+                }
+                else if((parseFloat(game["hscore"])+parseFloat(game["hcspread"])) > (parseFloat(game["vscore"]))){
+                    game["winner"] = "home";
+                }
+                else{
+                    game["winner"] = "visitor";
+                }
+            
+                if(parseFloat(game["ouclose"]) == (parseFloat(game["vscore"])+parseFloat(game["hscore"]))){
+                    game["ou"] = "tie";
+                }
+                else if(parseFloat(game["ouclose"]) < (parseFloat(game["vscore"])+parseFloat(game["hscore"]))){
+                    game["ou"] = "over";
+                }
+                else{
+                    game["ou"] = "under";
+                }
     
     
                 mergedData.push(game);
