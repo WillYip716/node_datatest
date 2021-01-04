@@ -44,7 +44,7 @@ async function findDates() {
 
 function addDates(yearsToCheck) {
     let week = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","WildCard","Division","ConfChamp","Superbowl"];
-    let weekcount
+    let weekcount;
     for (let i = 0; i < yearsToCheck.length; i++) {
       var text = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
       let spreads = JSON.parse(text);
@@ -84,5 +84,32 @@ function addDates(yearsToCheck) {
     } 
   }
 
+
+function anomalydates(yearsToCheck){
+    let adates = [];
+    let holder;
+    for (let i = 0; i < yearsToCheck.length; i++) {
+        var text = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+        let spreads = JSON.parse(text);
+        
+        
+        spreads.forEach(element => {
+            let month = parseInt(element["Date"].toString().slice(0,-2))-1;
+            let day = element["Date"].toString().slice(-2);
+            let year = yearsToCheck[i];
+            if(month == 0 || month == 1){
+                year++;
+            }
+            var d = new Date(year,month ,day).getDay();
+            if(d==2||d==3||d==5){
+                adates.push(year + " " + element["Date"]);
+            }
+        });
+    }
+    holder = [...new Set(adates)];
+    console.log(holder);
+}
+
 //findDates();
-addDates(years);
+//addDates(years);
+anomalydates(years);

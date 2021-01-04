@@ -215,6 +215,7 @@ function mlmerge(yearsToCheck){
             let game = {};
             game["vscore"] = spreads[j-1]["Final"];
             game["hscore"] = spreads[j]["Final"];   
+            
             if(divkey[spreads[j-1]["Team"]] == divkey[spreads[j]["Team"]]){
                 game["divgame"] = 1;
             }else{
@@ -316,5 +317,26 @@ function mlmerge(yearsToCheck){
     
 }
 
-getallgames();
+function datedifference(lastdate, currentdate){
+    let lmonth = parseInt(lastdate.toString().slice(0,-6))-1;
+    let lday = lastdate.toString().slice(-6,-4);
+    let lyear = lastdate.toString().slice(-4);
+    if(lmonth == 0 || lmonth == 1){
+        lyear++;
+    }
+    let cmonth = parseInt(currentdate.toString().slice(0,-6))-1;
+    let cday = currentdate.toString().slice(-6,-4);
+    let cyear = currentdate.toString().slice(-4);
+    if(cmonth == 0 || cmonth == 1){
+        cyear++;
+    }
+    let l = new Date(lyear,lmonth ,lday);
+    let c = new Date(cyear,cmonth ,cday);
+
+    //return Math.round((c-l)/(1000*60*60*24));
+    console.log(Math.round((c-l)/(1000*60*60*24)));
+}
+
+//getallgames();
 //mlmerge(years);
+datedifference("09142008","10032008");
