@@ -44,7 +44,6 @@ async function findDates() {
 
 function addDates(yearsToCheck) {
     let week = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","WildCard","Division","ConfChamp","Superbowl"];
-    let weekcount;
     for (let i = 0; i < yearsToCheck.length; i++) {
       var text = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
       let spreads = JSON.parse(text);

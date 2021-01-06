@@ -139,13 +139,12 @@ function merge(yearsToCheck){
 }
 
 
-function getallgames(){
-    let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-    //let years = ["2019"];
+function getallgames(yearsToCheck){
+
     let data = [];
-    for (let i = 0; i < years.length; i++) {
+    for (let i = 0; i < yearsToCheck.length; i++) {
       //let text = fs.readFileSync("./data/mergedstats" + years[i] +".txt");
-      let text = fs.readFileSync("./data/ml/mldata" + years[i] +".txt");
+      let text = fs.readFileSync("./data/ml/mldata" + yearsToCheck[i] +"v2.txt");
       
       let spreads = JSON.parse(text);
 
@@ -159,7 +158,7 @@ function getallgames(){
         console.log("success");
     
         // write CSV to a file
-        fs.writeFileSync('./data/ml/merged_mldata2007-2019.csv', csv);
+        fs.writeFileSync('./data/ml/merged_mldata2007-2019v2.csv', csv);
     });
 }
 
@@ -210,12 +209,31 @@ function mlmerge(yearsToCheck){
         let text2 = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
         let dvoastats = JSON.parse(text2);
         let mergedData = [];
+        let teamslastgame = {};
         //console.log("spreads length for " + yearsToCheck[i] + ": " + spreads.length);
+        //{"Date":904,"Rot":451,"VH":"V","Team":"WAS","1st":0,"2nd":7,"3rd":0,"4th":0,"Final":7,"Open":40,"Close":41.5,"ML":175,"2H":29.5,"week":"1"}
         for (let j = 1; j < 512; j+=2) {
             let game = {};
             game["vscore"] = spreads[j-1]["Final"];
             game["hscore"] = spreads[j]["Final"];   
-            
+            game["date"] = spreads[j]["Date"];
+
+            if(teamslastgame[spreads[j-1]["Team"]]){
+                game["vdflg"] = datedifference(teamslastgame[spreads[j-1]["Team"]],spreads[j-1]["Date"]+yearsToCheck[i]);
+                
+            }else{
+                game["vdflg"] = "-1";
+            }
+            teamslastgame[spreads[j-1]["Team"]] = spreads[j-1]["Date"]+yearsToCheck[i];
+
+            if(teamslastgame[spreads[j]["Team"]]){
+                game["hdflg"] = datedifference(teamslastgame[spreads[j]["Team"]],spreads[j]["Date"]+yearsToCheck[i]);
+                
+            }else{
+                game["hdflg"] = "-1";
+            }
+            teamslastgame[spreads[j]["Team"]] = spreads[j-1]["Date"]+yearsToCheck[i];
+
             if(divkey[spreads[j-1]["Team"]] == divkey[spreads[j]["Team"]]){
                 game["divgame"] = 1;
             }else{
@@ -310,7 +328,7 @@ function mlmerge(yearsToCheck){
 
         }
 
-        fs.writeFile("./data/ml/mldata" + yearsToCheck[i] +".txt", JSON.stringify(mergedData),function(err){
+        fs.writeFile("./data/ml/mldata" + yearsToCheck[i] +"v2.txt", JSON.stringify(mergedData),function(err){
             console.log("file written " + yearsToCheck[i]);
         })
     }
@@ -333,10 +351,10 @@ function datedifference(lastdate, currentdate){
     let l = new Date(lyear,lmonth ,lday);
     let c = new Date(cyear,cmonth ,cday);
 
-    //return Math.round((c-l)/(1000*60*60*24));
-    console.log(Math.round((c-l)/(1000*60*60*24)));
+    return Math.round((c-l)/(1000*60*60*24));
+    //console.log(Math.round((c-l)/(1000*60*60*24)));
 }
 
-//getallgames();
+getallgames(years);
 //mlmerge(years);
-datedifference("09142008","10032008");
+//datedifference("09142008","10032008");
