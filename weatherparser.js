@@ -4,7 +4,6 @@ const csv = require('csv-parser');
 const converter = require('json-2-csv');
 const puppeteer = require('puppeteer');
 const $ = require('cheerio');
-var fs = require("fs");
 
 
 function weathercsv(){
@@ -120,87 +119,157 @@ function parseweathercsv(data){
 }
 
 async function scrapeweather(){
+    const teamkeys = {
+        'Bengals':'CIN',
+        'Browns':'CLE',
+        'Giants':'NYG',
+        'Bears':'CHI',
+        'Falcons':'ATL',
+        'Cowboys':'DAL',
+        'Lions':'DET',
+        'Packers':'GB',
+        'Vikings':'MIN',
+        'Colts':'IND',
+        'Bills':'BUF',
+        'Dolphins':'MIA',
+        '49ers':'SF',
+        'Jets':'NYJ',
+        'Eagles':'PHI',
+        'Broncos':'DEN',
+        'Steelers':'PIT',
+        'Panthers':'CAR',
+        'Buccaneers':'TB',
+        'Jaguars':'JAX',
+        'Titans':'TEN',
+        'Washington':'WAS',
+        'Cardinals':'ARI',
+        'Ravens':'BAL',
+        'Texans':'HOU',
+        'Chiefs':'KC',
+        'Patriots':'NE',
+        'Seahawks':'SEA',
+        'Saints':'NO',
+        'Rams':'STL',
+        'Chargers': 'SD',
+        'Raiders': 'OAK',
+        'Redskins' : 'WAS'
+      };
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
+    const year = 2011;
     let url;
     //let week = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17"];
-    let week = ["1","2"];
+    let week = ["9","10","11","12","13","14","15","16","17"];
+    let output = [];
     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
     
     for (let i = 0; i < week.length; i++) {
-        
-        url = "http://www.nflweather.com/en/week/2010/week-"+week[i]+"-2/";
-        await page.goto(url, { waitUntil: 'networkidle0' });
-        const content = await page.content();
-        $('table.footable>tbody>tr', content).each((index,element) => {
-            //console.log("elements is : " + $(element).text());
-            let game = {};
-            let gameinfo = $(element).find("td");
-
-            console.log("away team is : " +$(gameinfo[1]).text());
-            console.log("home team is : " +$(gameinfo[5]).text());
-            console.log("weather is : " +$(gameinfo[9]).text());
-            console.log("wind is : " +$(gameinfo[10]).text());
-
-            game["vteam"] = $(gameinfo[1]).text();
-            game["hteam"] = $(gameinfo[1]).text();
-            game["temp"] = $(gameinfo[1]).text();
-            game["wind_mph"] = $(gameinfo[1]).text();
-
-
-
-          /*            
-            let game = {};
-            game.date = dates[i];
-
-            let teams = $(element).find("tbody.participantBox-3ar9Y");
-            game.away_team = $(teams[0]).text();
-            game.home_team = $(teams[1]).text();
-
-            let scores = $(element).find("div.finalScore-156Hx > div");
-            game.away_score = $(scores[0]).text();
-            game.home_score = $(scores[1]).text();
-
-            let lines = $(element).find("span.adjust-1uDgI");
-
-            if($(lines[0]).text().charAt(0) == "-"){
-                game.away_open = $(lines[0]).text().replace("½",".5");
-                game.home_open = "+" + $(lines[0]).text().slice(1).replace("½",".5");
-                game.total_open = $(lines[1]).text().replace("½",".5");
-            }
-            else{
-                game.away_open = "+" + $(lines[1]).text().slice(1).replace("½",".5");
-                game.home_open = $(lines[1]).text().replace("½",".5");
-                game.total_open = $(lines[0]).text().replace("½",".5");
-            }
-
-            if($(lines[2]).text().charAt(0) == "-"){
-                game.away_close = $(lines[2]).text().replace("½",".5");
-                game.home_close = "+" + $(lines[2]).text().slice(1).replace("½",".5");
-                game.total_close = $(lines[3]).text().replace("½",".5");
-            }
-            else{
-                game.away_close = "+" + $(lines[3]).text().slice(1).replace("½",".5");
-                game.home_close = $(lines[3]).text().replace("½",".5"); 
-                game.total_close = $(lines[2]).text().replace("½",".5");
-            }
-
-
-            spreadsinfo.push(game);*/
-
+       try {
+            url = "http://www.nflweather.com/en/week/"+year+"/week-"+week[i]+"/";
             
+            await page.goto(url, { waitUntil: 'networkidle0' });
+            const content = await page.content();
+            $('table.footable>tbody>tr', content).each((index,element) => {
+                //console.log("elements is : " + $(element).text());
+                let game = {};
+                let gameinfo = $(element).find("td");
 
-        });
-        //console.log(dates[i] + " finished");
+                
+                game["year"] = year;
+                game["week"] = week[i];
+                game["vteam"] = teamkeys[$(gameinfo[1]).text().trim()];
+                game["hteam"] = teamkeys[$(gameinfo[5]).text().trim()];
+                if($(gameinfo[9]).text().indexOf("DOME")>-1){
+                    game["temp"] = 72;
+                    game["wind_mph"] = 0;
+                }else{
+                    game["temp"] = $(gameinfo[9]).text().trim().split(" ")[0];
+                    game["temp"] = game["temp"].substring(0, game["temp"].length - 1);
+                    game["wind_mph"] = $(gameinfo[10]).text().trim().split(" ")[0];
+                    game["wind_mph"] = game["wind_mph"].substring(0, game["wind_mph"].length - 1);
+                    if(!game["wind_mph"]){
+                        game["wind_mph"] = "no wind data";
+                    }
+                }
+                
+                output.push(game);
+                
+            });
+       } catch (error) {
+            console.log("failed to complete full scrape");
+            converter.json2csv(output, (err, csv) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("success in transferring partial data");
+        
+                // write CSV to a file
+                fs.writeFileSync('./data/weatherdatascraped'+year+'.csv', csv);
+            });
+            await browser.close();
+       }
+       console.log(week[i] + " completed");
     }
     
-    /*
-    fs.writeFile("./data/2019spreads.txt", JSON.stringify(spreadsinfo),function(err){
-        console.log("file written with " + spreadsinfo.length + " games");
-    })
-*/
+
+
+    converter.json2csv(output, (err, csv) => {
+        if (err) {
+            throw err;
+        }
+        console.log("success");
+
+        // write CSV to a file
+        fs.writeFileSync('./data/weatherdatascraped'+year+'v2.csv', csv);
+    });
     await browser.close();
 }
 
+function csvconverter(){
+    
+    const data = []
+    fs.createReadStream('./data/weatherdatascraped2010.csv')
+      .pipe(csv())
+      .on('data', (r) => {
+        data.push(r);        
+      })
+      .on('end', () => {
+        fs.writeFile("./data/weatherdatascraped2010.txt", JSON.stringify(data),function(err){
+            console.log("file converted");
+        })
+    })    
+
+}
+
+function combinedweather(){
+    let text1 = fs.readFileSync("./data/weatherdatascraped2010.txt");
+    let scraped = JSON.parse(text1);
+    let text2 = fs.readFileSync("./data/weatherdata.txt");
+    let base = JSON.parse(text2);
+    let output = [];
+
+    for (let i = 0; i < scraped.length; i++) {
+        let game = scraped[i];
+        let founddata = base.find(element=> (element["year"] == game["year"])&&(element["week"] == game["week"])&&(element["vteam"] == game["vteam"])&&(element["hteam"] == game["hteam"]));
+        if(founddata){
+            game["wind_mph"] = founddata["wind_mph"];
+        }
+        output.push(game);
+    }
+
+    converter.json2csv(output, (err, csv) => {
+        if (err) {
+            throw err;
+        }
+        console.log("success");
+
+        // write CSV to a file
+        fs.writeFileSync('./data/weatherdata2010combined.csv', csv);
+    });
+    
+}
+
 //weathercsv();
-scrapeweather();
+//scrapeweather();
+//csvconverter();
+combinedweather();
