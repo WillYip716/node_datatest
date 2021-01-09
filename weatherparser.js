@@ -6,16 +6,18 @@ const puppeteer = require('puppeteer');
 const $ = require('cheerio');
 
 
-function weathercsv(){
+function csvconverter(file){
     
-    const weatherdata = [];
-    fs.createReadStream('./data/weather_20131231.csv')
+    const data = []
+    fs.createReadStream('./data/'+file+'.csv')
       .pipe(csv())
       .on('data', (r) => {
-        weatherdata.push(r);        
+        data.push(r);        
       })
       .on('end', () => {
-        parseweathercsv(weatherdata);
+        fs.writeFile("./data/"+file+".txt", JSON.stringify(data),function(err){
+            console.log("file converted");
+        })
     })    
 
 }
@@ -156,10 +158,10 @@ async function scrapeweather(){
       };
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    const year = 2011;
+    const year = 2019;
     let url;
     //let week = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17"];
-    let week = ["9","10","11","12","13","14","15","16","17"];
+    let week = ["13"];
     let output = [];
     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
     
@@ -185,7 +187,7 @@ async function scrapeweather(){
                 }else{
                     game["temp"] = $(gameinfo[9]).text().trim().split(" ")[0];
                     game["temp"] = game["temp"].substring(0, game["temp"].length - 1);
-                    game["wind_mph"] = $(gameinfo[10]).text().trim().split(" ")[0];
+                    game["wind_mph"] = $(gameinfo[11]).text().trim().split(" ")[0];
                     game["wind_mph"] = game["wind_mph"].substring(0, game["wind_mph"].length - 1);
                     if(!game["wind_mph"]){
                         game["wind_mph"] = "no wind data";
@@ -204,15 +206,12 @@ async function scrapeweather(){
                 console.log("success in transferring partial data");
         
                 // write CSV to a file
-                fs.writeFileSync('./data/weatherdatascraped'+year+'.csv', csv);
+                fs.writeFileSync('./data/weatherdatascraped'+year+'v2.csv', csv);
             });
             await browser.close();
        }
        console.log(week[i] + " completed");
     }
-    
-
-
     converter.json2csv(output, (err, csv) => {
         if (err) {
             throw err;
@@ -225,24 +224,10 @@ async function scrapeweather(){
     await browser.close();
 }
 
-function csvconverter(){
-    
-    const data = []
-    fs.createReadStream('./data/weatherdatascraped2010.csv')
-      .pipe(csv())
-      .on('data', (r) => {
-        data.push(r);        
-      })
-      .on('end', () => {
-        fs.writeFile("./data/weatherdatascraped2010.txt", JSON.stringify(data),function(err){
-            console.log("file converted");
-        })
-    })    
 
-}
 
 function combinedweather(){
-    let text1 = fs.readFileSync("./data/weatherdatascraped2010.txt");
+    let text1 = fs.readFileSync("./data/weatherdatascraped2011.txt");
     let scraped = JSON.parse(text1);
     let text2 = fs.readFileSync("./data/weatherdata.txt");
     let base = JSON.parse(text2);
@@ -264,12 +249,12 @@ function combinedweather(){
         console.log("success");
 
         // write CSV to a file
-        fs.writeFileSync('./data/weatherdata2010combined.csv', csv);
+        fs.writeFileSync('./data/weatherdata2011combined.csv', csv);
     });
     
 }
 
 //weathercsv();
 //scrapeweather();
-//csvconverter();
-combinedweather();
+csvconverter("weatherdata");
+//combinedweather();

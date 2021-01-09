@@ -4,6 +4,7 @@ const csv = require('csv-parser');
 const converter = require('json-2-csv');
 
 let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+//let years = ["2007"];
 function merge(yearsToCheck){
 
     
@@ -203,6 +204,8 @@ function mlmerge(yearsToCheck){
         "STL": "nfcw",
         "LAR": "nfcw"
     };
+    let weatherdata = fs.readFileSync("./data/weatherdata.txt");
+    weatherdata = JSON.parse(weatherdata);
     for(let i = 0; i<yearsToCheck.length;i++){
         let text1 = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
         let spreads = JSON.parse(text1);
@@ -216,7 +219,14 @@ function mlmerge(yearsToCheck){
             let game = {};
             game["vscore"] = spreads[j-1]["Final"];
             game["hscore"] = spreads[j]["Final"];   
-            game["date"] = spreads[j]["Date"];
+            
+
+
+            let gameweather = weatherdata.find(element=> element["hteam"] == spreads[j]["Team"] && element["vteam"] == spreads[j-1]["Team"] && element["year"] == yearsToCheck[i] && element["week"] == spreads[j]["week"]);
+            if(gameweather){
+                game["temp"] = gameweather["temp"];
+                game["wind_mph"] = gameweather["wind_mph"];   
+            }
 
             if(teamslastgame[spreads[j-1]["Team"]]){
                 game["vdflg"] = datedifference(teamslastgame[spreads[j-1]["Team"]],spreads[j-1]["Date"]+yearsToCheck[i]);
@@ -267,6 +277,7 @@ function mlmerge(yearsToCheck){
             let vteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j-1]["Team"] && element.week == wkey[spreads[j]["week"]]);
             let hteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j]["Team"] && element.week == wkey[spreads[j]["week"]]);
             if(vteamdvoa&&hteamdvoa&&vteamdvoa["OFF.DVOA"]){
+                
                 if(vteamdvoa["WEI.DVOA"]){
                     game["vTOTAL.DVOA"] = parseFloat(vteamdvoa["WEI.DVOA"]);
                 }
