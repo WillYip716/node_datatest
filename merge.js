@@ -213,70 +213,80 @@ function mlmerge(yearsToCheck){
         let dvoastats = JSON.parse(text2);
         let mergedData = [];
         let teamslastgame = {};
-        //console.log("spreads length for " + yearsToCheck[i] + ": " + spreads.length);
+        let teamwins = {};
+        let teamlosses = {};
+        let teamties = {};
+        let teamspreadwins = {};
+        let teamspreadlosses = {};
+        let teamspreadties = {};
+        let teamstreak = {};
+
         //{"Date":904,"Rot":451,"VH":"V","Team":"WAS","1st":0,"2nd":7,"3rd":0,"4th":0,"Final":7,"Open":40,"Close":41.5,"ML":175,"2H":29.5,"week":"1"}
         for (let j = 1; j < 512; j+=2) {
-            let game = {};
-            game["vscore"] = spreads[j-1]["Final"];
-            game["hscore"] = spreads[j]["Final"];   
-            
 
-
-            let gameweather = weatherdata.find(element=> element["hteam"] == spreads[j]["Team"] && element["vteam"] == spreads[j-1]["Team"] && element["year"] == yearsToCheck[i] && element["week"] == spreads[j]["week"]);
-            if(gameweather){
-                game["temp"] = gameweather["temp"];
-                game["wind_mph"] = gameweather["wind_mph"];   
-            }
-
-            if(teamslastgame[spreads[j-1]["Team"]]){
-                game["vdflg"] = datedifference(teamslastgame[spreads[j-1]["Team"]],spreads[j-1]["Date"]+yearsToCheck[i]);
-                
-            }else{
-                game["vdflg"] = "-1";
-            }
-            teamslastgame[spreads[j-1]["Team"]] = spreads[j-1]["Date"]+yearsToCheck[i];
-
-            if(teamslastgame[spreads[j]["Team"]]){
-                game["hdflg"] = datedifference(teamslastgame[spreads[j]["Team"]],spreads[j]["Date"]+yearsToCheck[i]);
-                
-            }else{
-                game["hdflg"] = "-1";
-            }
-            teamslastgame[spreads[j]["Team"]] = spreads[j-1]["Date"]+yearsToCheck[i];
-
-            if(divkey[spreads[j-1]["Team"]] == divkey[spreads[j]["Team"]]){
-                game["divgame"] = 1;
-            }else{
-                game["divgame"] = 0;
-            }
-            if(spreads[j]["VH"] == "N"){
-                game["nsite"] = 1;
-            }else{
-                game["nsite"] = 0;
-            }
-            if(spreads[j]["Open"] > spreads[j-1]["Open"]){
-                game["vospread"] = parseFloat("-" + spreads[j-1]["Open"]);
-                game["hospread"] = parseFloat("+" + spreads[j-1]["Open"]); 
-                game["ouopen"] = parseFloat(spreads[j]["Open"]);
-            }
-            else{
-                game["vospread"] = parseFloat("+" + spreads[j]["Open"]);
-                game["hospread"] = parseFloat("-" + spreads[j]["Open"]);
-                game["ouopen"] = parseFloat(spreads[j-1]["Open"]);
-            }
-            if(spreads[j]["Close"] > spreads[j-1]["Close"]){
-                game["vcspread"] = parseFloat("-" + spreads[j-1]["Close"]);
-                game["hcspread"] = parseFloat("+" + spreads[j-1]["Close"]);
-                game["ouclose"] = parseFloat(spreads[j]["Close"]);
-            }
-            else{
-                game["vcspread"] = parseFloat("+" + spreads[j]["Close"]);
-                game["hcspread"] = parseFloat("-" + spreads[j]["Close"]);
-                game["ouclose"] = parseFloat(spreads[j-1]["Close"]);
-            }
             let vteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j-1]["Team"] && element.week == wkey[spreads[j]["week"]]);
             let hteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j]["Team"] && element.week == wkey[spreads[j]["week"]]);
             if(vteamdvoa&&hteamdvoa&&vteamdvoa["OFF.DVOA"]){
+
+                let game = {};
+                game["vscore"] = spreads[j-1]["Final"];
+                game["hscore"] = spreads[j]["Final"];   
+                
+
+
+                let gameweather = weatherdata.find(element=> element["hteam"] == spreads[j]["Team"] && element["vteam"] == spreads[j-1]["Team"] && element["year"] == yearsToCheck[i] && element["week"] == spreads[j]["week"]);
+                if(gameweather){
+                    game["temp"] = gameweather["temp"];
+                    game["wind_mph"] = gameweather["wind_mph"];   
+                }
+
+                if(teamslastgame[spreads[j-1]["Team"]]){
+                    game["vdflg"] = datedifference(teamslastgame[spreads[j-1]["Team"]],spreads[j-1]["Date"]+yearsToCheck[i]);
+                    
+                }else{
+                    game["vdflg"] = "-1";
+                }
+                teamslastgame[spreads[j-1]["Team"]] = spreads[j-1]["Date"]+yearsToCheck[i];
+
+                if(teamslastgame[spreads[j]["Team"]]){
+                    game["hdflg"] = datedifference(teamslastgame[spreads[j]["Team"]],spreads[j]["Date"]+yearsToCheck[i]);
+                    
+                }else{
+                    game["hdflg"] = "-1";
+                }
+                teamslastgame[spreads[j]["Team"]] = spreads[j-1]["Date"]+yearsToCheck[i];
+
+                if(divkey[spreads[j-1]["Team"]] == divkey[spreads[j]["Team"]]){
+                    game["divgame"] = 1;
+                }else{
+                    game["divgame"] = 0;
+                }
+                if(spreads[j]["VH"] == "N"){
+                    game["nsite"] = 1;
+                }else{
+                    game["nsite"] = 0;
+                }
+                if(spreads[j]["Open"] > spreads[j-1]["Open"]){
+                    game["vospread"] = parseFloat("-" + spreads[j-1]["Open"]);
+                    game["hospread"] = parseFloat("+" + spreads[j-1]["Open"]); 
+                    game["ouopen"] = parseFloat(spreads[j]["Open"]);
+                }
+                else{
+                    game["vospread"] = parseFloat("+" + spreads[j]["Open"]);
+                    game["hospread"] = parseFloat("-" + spreads[j]["Open"]);
+                    game["ouopen"] = parseFloat(spreads[j-1]["Open"]);
+                }
+                if(spreads[j]["Close"] > spreads[j-1]["Close"]){
+                    game["vcspread"] = parseFloat("-" + spreads[j-1]["Close"]);
+                    game["hcspread"] = parseFloat("+" + spreads[j-1]["Close"]);
+                    game["ouclose"] = parseFloat(spreads[j]["Close"]);
+                }
+                else{
+                    game["vcspread"] = parseFloat("+" + spreads[j]["Close"]);
+                    game["hcspread"] = parseFloat("-" + spreads[j]["Close"]);
+                    game["ouclose"] = parseFloat(spreads[j-1]["Close"]);
+                }
+            
                 
                 if(vteamdvoa["WEI.DVOA"]){
                     game["vTOTAL.DVOA"] = parseFloat(vteamdvoa["WEI.DVOA"]);
@@ -310,15 +320,121 @@ function mlmerge(yearsToCheck){
                 game["hST.RNK"] = hteamdvoa["ST.RNK"];
                 game["hST.DVOA"] = parseFloat(hteamdvoa["ST.DVOA"]);
 
+                //spreads
+                if(!teamspreadties[spreads[j-1]["Team"]]){
+                    teamspreadties[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamspreadties[spreads[j]["Team"]]){
+                    teamspreadties[spreads[j]["Team"]] = 0;
+                }
+                if(!teamspreadwins[spreads[j-1]["Team"]]){
+                    teamspreadwins[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamspreadwins[spreads[j]["Team"]]){
+                    teamspreadwins[spreads[j]["Team"]] = 0;
+                }
+                if(!teamspreadlosses[spreads[j-1]["Team"]]){
+                    teamspreadlosses[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamspreadlosses[spreads[j]["Team"]]){
+                    teamspreadlosses[spreads[j]["Team"]] = 0;
+                }
+                //straight up
+                if(!teamties[spreads[j-1]["Team"]]){
+                    teamties[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamties[spreads[j]["Team"]]){
+                    teamties[spreads[j]["Team"]] = 0;
+                }
+                if(!teamlosses[spreads[j-1]["Team"]]){
+                    teamlosses[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamlosses[spreads[j]["Team"]]){
+                    teamlosses[spreads[j]["Team"]] = 0;
+                }
+                if(!teamwins[spreads[j-1]["Team"]]){
+                    teamwins[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamwins[spreads[j]["Team"]]){
+                    teamwins[spreads[j]["Team"]] = 0;
+                }
+                if(!teamstreak[spreads[j-1]["Team"]]){
+                    teamstreak[spreads[j-1]["Team"]] = 0;
+                }
+                if(!teamstreak[spreads[j]["Team"]]){
+                    teamstreak[spreads[j]["Team"]] = 0;
+                }
+
+                game["vtsw"] = teamspreadwins[spreads[j-1]["Team"]];
+                game["vtsl"] = teamspreadlosses[spreads[j-1]["Team"]];
+                game["vtst"] = teamspreadties[spreads[j-1]["Team"]];
+                game["htsw"] = teamspreadwins[spreads[j]["Team"]];
+                game["htsl"] = teamspreadlosses[spreads[j]["Team"]];
+                game["htst"] = teamspreadties[spreads[j]["Team"]];
+                game["vtw"] = teamwins[spreads[j-1]["Team"]];
+                game["vtl"] = teamlosses[spreads[j-1]["Team"]];
+                game["vtt"] = teamties[spreads[j-1]["Team"]];
+                game["vts"] = teamstreak[spreads[j-1]["Team"]];
+                game["htw"] = teamwins[spreads[j]["Team"]];
+                game["htl"] = teamlosses[spreads[j]["Team"]];
+                game["htt"] = teamties[spreads[j]["Team"]];
+                game["hts"] = teamstreak[spreads[j]["Team"]];
+
+
                 if((parseFloat(game["hscore"])+parseFloat(game["hcspread"])) == (parseFloat(game["vscore"]))){
-                    game["winner"] = "tie";
+                    game["sWinner"] = "tie";
+                    teamspreadties[spreads[j-1]["Team"]] = teamspreadties[spreads[j-1]["Team"]] + 1;
+                    teamspreadties[spreads[j]["Team"]] = teamspreadties[spreads[j]["Team"]] + 1;
                 }
                 else if((parseFloat(game["hscore"])+parseFloat(game["hcspread"])) > (parseFloat(game["vscore"]))){
+                    game["sWinner"] = "home";
+                    teamspreadlosses[spreads[j-1]["Team"]] = teamspreadlosses[spreads[j-1]["Team"]] + 1;
+                    teamspreadwins[spreads[j]["Team"]] = teamspreadwins[spreads[j]["Team"]] + 1;
+                }
+                else{
+                    game["sWinner"] = "visitor";
+                    teamspreadwins[spreads[j-1]["Team"]] = teamspreadwins[spreads[j-1]["Team"]] + 1;
+                    teamspreadlosses[spreads[j]["Team"]] = teamspreadlosses[spreads[j]["Team"]] + 1;
+                }
+
+                if((parseFloat(game["hscore"])) == (parseFloat(game["vscore"]))){
+                    game["winner"] = "tie";
+                    teamties[spreads[j-1]["Team"]] = teamties[spreads[j-1]["Team"]] + 1;
+                    teamties[spreads[j]["Team"]] = teamties[spreads[j]["Team"]] + 1;
+                    teamstreak[spreads[j-1]["Team"]] = 0;
+                    teamstreak[spreads[j]["Team"]] = 0;
+                }
+                else if((parseFloat(game["hscore"])) > (parseFloat(game["vscore"]))){
                     game["winner"] = "home";
+                    teamlosses[spreads[j-1]["Team"]] = teamlosses[spreads[j-1]["Team"]] + 1;
+                    teamwins[spreads[j]["Team"]] = teamwins[spreads[j]["Team"]] + 1;
+                    if(teamstreak[spreads[j-1]["Team"]] > 0){
+                        teamstreak[spreads[j-1]["Team"]] = -1;
+                    }else{
+                        teamstreak[spreads[j-1]["Team"]] = teamstreak[spreads[j-1]["Team"]] - 1;
+                    }
+                    if(teamstreak[spreads[j]["Team"]] < 0){
+                        teamstreak[spreads[j]["Team"]] = 1;
+                    }else{
+                        teamstreak[spreads[j]["Team"]] = teamstreak[spreads[j]["Team"]] + 1;
+                    }
                 }
                 else{
                     game["winner"] = "visitor";
+                    teamwins[spreads[j-1]["Team"]] = teamwins[spreads[j-1]["Team"]] + 1;
+                    teamlosses[spreads[j]["Team"]] = teamlosses[spreads[j]["Team"]] + 1;
+                    if(teamstreak[spreads[j-1]["Team"]] > 0){
+                        teamstreak[spreads[j-1]["Team"]] = teamstreak[spreads[j-1]["Team"]] + 1;
+                    }else{
+                        teamstreak[spreads[j-1]["Team"]] = 1;
+                    }
+                    if(teamstreak[spreads[j]["Team"]] < 0){
+                        teamstreak[spreads[j]["Team"]] = teamstreak[spreads[j]["Team"]] - 1;
+                    }else{
+                        teamstreak[spreads[j]["Team"]] = -1;
+                    }
                 }
+
             
                 if(parseFloat(game["ouclose"]) == (parseFloat(game["vscore"])+parseFloat(game["hscore"]))){
                     game["ou"] = "tie";
@@ -329,7 +445,6 @@ function mlmerge(yearsToCheck){
                 else{
                     game["ou"] = "under";
                 }
-    
     
                 mergedData.push(game);
             }
