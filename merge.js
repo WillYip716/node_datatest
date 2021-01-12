@@ -230,8 +230,9 @@ function mlmerge(yearsToCheck){
 
                 let game = {};
                 game["vscore"] = spreads[j-1]["Final"];
-                game["hscore"] = spreads[j]["Final"];   
-                
+                game["hscore"] = spreads[j]["Final"];
+                game["fspread"] = parseInt(spreads[j-1]["Final"]) - parseInt(spreads[j]["Final"]);
+                game["fscore"] = parseInt(spreads[j]["Final"]) + parseInt(spreads[j-1]["Final"]);
 
 
                 let gameweather = weatherdata.find(element=> element["hteam"] == spreads[j]["Team"] && element["vteam"] == spreads[j-1]["Team"] && element["year"] == yearsToCheck[i] && element["week"] == spreads[j]["week"]);
@@ -382,30 +383,30 @@ function mlmerge(yearsToCheck){
 
 
                 if((parseFloat(game["hscore"])+parseFloat(game["hcspread"])) == (parseFloat(game["vscore"]))){
-                    game["sWinner"] = "tie";
+                    game["sWinner"] = "0";
                     teamspreadties[spreads[j-1]["Team"]] = teamspreadties[spreads[j-1]["Team"]] + 1;
                     teamspreadties[spreads[j]["Team"]] = teamspreadties[spreads[j]["Team"]] + 1;
                 }
                 else if((parseFloat(game["hscore"])+parseFloat(game["hcspread"])) > (parseFloat(game["vscore"]))){
-                    game["sWinner"] = "home";
+                    game["sWinner"] = "1";
                     teamspreadlosses[spreads[j-1]["Team"]] = teamspreadlosses[spreads[j-1]["Team"]] + 1;
                     teamspreadwins[spreads[j]["Team"]] = teamspreadwins[spreads[j]["Team"]] + 1;
                 }
                 else{
-                    game["sWinner"] = "visitor";
+                    game["sWinner"] = "-1";
                     teamspreadwins[spreads[j-1]["Team"]] = teamspreadwins[spreads[j-1]["Team"]] + 1;
                     teamspreadlosses[spreads[j]["Team"]] = teamspreadlosses[spreads[j]["Team"]] + 1;
                 }
 
                 if((parseFloat(game["hscore"])) == (parseFloat(game["vscore"]))){
-                    game["winner"] = "tie";
+                    game["winner"] = "0";
                     teamties[spreads[j-1]["Team"]] = teamties[spreads[j-1]["Team"]] + 1;
                     teamties[spreads[j]["Team"]] = teamties[spreads[j]["Team"]] + 1;
                     teamstreak[spreads[j-1]["Team"]] = 0;
                     teamstreak[spreads[j]["Team"]] = 0;
                 }
                 else if((parseFloat(game["hscore"])) > (parseFloat(game["vscore"]))){
-                    game["winner"] = "home";
+                    game["winner"] = "1";
                     teamlosses[spreads[j-1]["Team"]] = teamlosses[spreads[j-1]["Team"]] + 1;
                     teamwins[spreads[j]["Team"]] = teamwins[spreads[j]["Team"]] + 1;
                     if(teamstreak[spreads[j-1]["Team"]] > 0){
@@ -420,7 +421,7 @@ function mlmerge(yearsToCheck){
                     }
                 }
                 else{
-                    game["winner"] = "visitor";
+                    game["winner"] = "-1";
                     teamwins[spreads[j-1]["Team"]] = teamwins[spreads[j-1]["Team"]] + 1;
                     teamlosses[spreads[j]["Team"]] = teamlosses[spreads[j]["Team"]] + 1;
                     if(teamstreak[spreads[j-1]["Team"]] > 0){
@@ -437,13 +438,13 @@ function mlmerge(yearsToCheck){
 
             
                 if(parseFloat(game["ouclose"]) == (parseFloat(game["vscore"])+parseFloat(game["hscore"]))){
-                    game["ou"] = "tie";
+                    game["ou"] = "0";
                 }
                 else if(parseFloat(game["ouclose"]) < (parseFloat(game["vscore"])+parseFloat(game["hscore"]))){
-                    game["ou"] = "over";
+                    game["ou"] = "1";
                 }
                 else{
-                    game["ou"] = "under";
+                    game["ou"] = "-1";
                 }
     
                 mergedData.push(game);
