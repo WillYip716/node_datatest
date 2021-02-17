@@ -1,12 +1,12 @@
 var fs = require("fs");
 var XLSX = require('xlsx');
 
-let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-//let years = ["2015"];
+//let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+let years = ["2020"];
 
 function cleanerAndNormalize(yearsToCheck) {
-  let parser = /\\t/gi;
-  /*let parser = /TOTALVOA|TOTALDVOA/gi;
+  //let parser = /\\t/gi;
+  /*let parser0 = /TOTALVOA|TOTALDVOA/gi;
   let parser1 = /TOTALDAVE/gi;
   let parser2 = /WEIGHTEDDVOA|WEIGHTEDVOA/gi;
   let parser3 = /OFFENSEVOA|OFF.DVOA|OFFENSEDVOA/gi;
@@ -18,14 +18,14 @@ function cleanerAndNormalize(yearsToCheck) {
   let parser9 = /SCHEDRANK/gi;
   let parser10 = /RANK|TOTAL.RK|TOTALRANK/gi;*/
   for (let i = 0; i < yearsToCheck.length; i++) {
-    //var readFile = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
-    var readFile = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
+    var readFile = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
+    //var readFile = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
     var text = readFile.toString();
-    text = text.replace(/LARM/gi,"LAR");
-    text = text.replace(/LACH/gi,"LAC");
-    text = text.replace(/JAC/gi,"JAX");
-    //text = text.replace(/"pk"/gi,"0");
-    /*text = text.replace(/NewOrleans/gi,"NO");
+    //text = text.replace(/LARM/gi,"LAR");
+    //text = text.replace(/LACH/gi,"LAC");
+    //text = text.replace(/JAC/gi,"JAX");
+    text = text.replace(/"pk"/gi,"0");
+    text = text.replace(/NewOrleans/gi,"NO");
     text = text.replace(/Indianapolis/gi,"IND");
     text = text.replace(/KansasCity/gi,"KC");
     text = text.replace(/HoustonTexans/gi,"HOU");
@@ -61,7 +61,7 @@ function cleanerAndNormalize(yearsToCheck) {
     text = text.replace(/SanFrancisco/gi,"SF");
     text = text.replace(/LosAngeles|LARams/gi,"LAR");
     text = text.replace(/LAChargers/gi,"LAC");
-    text = text.replace(parser,"TOTAL.DVOA");
+    /*text = text.replace(parser0,"TOTAL.DVOA");
     text = text.replace(parser1,"DAVE");
     text = text.replace(parser2,"WEI.DVOA");
     text = text.replace(parser3,"OFF.DVOA");
@@ -71,11 +71,11 @@ function cleanerAndNormalize(yearsToCheck) {
     text = text.replace(parser7,"ST.DVOA");
     text = text.replace(parser8,"ST.RNK");
     text = text.replace(parser9,"SCHEDRNK");
-    text = text.replace(parser10,"TOTAL.RNK");*/
-    //console.log(spreads.length);
+    text = text.replace(parser10,"TOTAL.RNK");
+    //console.log(spreads.length);*/
     
   
-    fs.writeFile("./data/" + yearsToCheck[i] +"dvoaRanking.txt", text,function(err){
+    fs.writeFile("./data/nflodds" + yearsToCheck[i] +".txt", text,function(err){
       console.log("anomalies " + yearsToCheck[i] + " written");
     })
   
@@ -96,4 +96,5 @@ function xlsxToJson(yearsToCheck){
   }  
 }
 
+//xlsxToJson(years);
 cleanerAndNormalize(years);

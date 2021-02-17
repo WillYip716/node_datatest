@@ -3,8 +3,8 @@ const $ = require('cheerio');
 var fs = require("fs");
 const { parseInt, last } = require('lodash');
 
-let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-//let years = ["2019"];
+//let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+let years = ["2020"];
 
 
 
@@ -60,7 +60,7 @@ function addDates(yearsToCheck) {
         }
 
         var d = new Date(year,month ,day).getDay();
-        if((lastday==1&&d==4)||(lastday==1&&d==5)||(lastday==2&&d==0)||(lastday==2&&d==4)||(lastday==0&&d==6)||(lastday==1&&d==6)||(lastday==0&&d==6)||(lastday==1&&d==0)||(lastday==0&&d==0&&(lastdate!=element["Date"]))){
+        if((lastday==3&&d==0)||(lastday==3&&d==4)||(lastday==1&&d==4)||(lastday==1&&d==5)||(lastday==2&&d==0)||(lastday==2&&d==4)||(lastday==0&&d==6)||(lastday==1&&d==6)||(lastday==0&&d==6)||(lastday==1&&d==0)||(lastday==0&&d==0&&(lastdate!=element["Date"]))){
             weekcount++;
         }
         if(week[weekcount] in output){
@@ -110,5 +110,5 @@ function anomalydates(yearsToCheck){
 }
 
 //findDates();
-//addDates(years);
-anomalydates(years);
+addDates(years);
+//anomalydates(years);

@@ -158,10 +158,10 @@ async function scrapeweather(){
       };
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    const year = 2019;
+    const year = 2020;
     let url;
-    //let week = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17"];
-    let week = ["13"];
+    let week = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17"];
+    //let week = ["13"];
     let output = [];
     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
     

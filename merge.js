@@ -3,8 +3,8 @@ var XLSX = require('xlsx')
 const csv = require('csv-parser');
 const converter = require('json-2-csv');
 
-let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
-//let years = ["2007"];
+//let years = ["2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"];
+let years = ["2020"];
 function merge(yearsToCheck){
 
     
@@ -207,6 +207,7 @@ function mlmerge(yearsToCheck){
     let weatherdata = fs.readFileSync("./data/weatherdata.txt");
     weatherdata = JSON.parse(weatherdata);
     for(let i = 0; i<yearsToCheck.length;i++){
+
         let text1 = fs.readFileSync("./data/nflodds" + yearsToCheck[i] +".txt");
         let spreads = JSON.parse(text1);
         let text2 = fs.readFileSync("./data/" + yearsToCheck[i] +"dvoaRanking.txt");
@@ -223,12 +224,11 @@ function mlmerge(yearsToCheck){
 
         //{"Date":904,"Rot":451,"VH":"V","Team":"WAS","1st":0,"2nd":7,"3rd":0,"4th":0,"Final":7,"Open":40,"Close":41.5,"ML":175,"2H":29.5,"week":"1"}
         for (let j = 1; j < 512; j+=2) {
-
             let vteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j-1]["Team"] && element.week == wkey[spreads[j]["week"]]);
             let hteamdvoa = dvoastats.find(element=> element.TEAM == spreads[j]["Team"] && element.week == wkey[spreads[j]["week"]]);
             if(vteamdvoa&&hteamdvoa&&vteamdvoa["OFF.DVOA"]){
 
-                let game = {};
+                let game = {};  
                 game["vscore"] = spreads[j-1]["Final"];
                 game["hscore"] = spreads[j]["Final"];
                 game["fspread"] = parseInt(spreads[j-1]["Final"]) - parseInt(spreads[j]["Final"]);
@@ -446,7 +446,7 @@ function mlmerge(yearsToCheck){
                 else{
                     game["ou"] = "-1";
                 }
-    
+                
                 mergedData.push(game);
             }
             
@@ -482,6 +482,6 @@ function datedifference(lastdate, currentdate){
     //console.log(Math.round((c-l)/(1000*60*60*24)));
 }
 
-getallgames(years);
-//mlmerge(years);
+//getallgames(years);
+mlmerge(years);
 //datedifference("09142008","10032008");
